@@ -19,11 +19,16 @@ def generate_default_anchor_maps(anchors_setting=None, input_shape=INPUT_SIZE):
 	:param 
 		- anchors_setting: all informations of anchors
 		- input_shape: shape of input images, e.g. (h, w)
+	:type
+		- dict
+		- Tuple[int, int]
 
 	:return
 		- centre_anchors: # anchors * 4 (oy, ox, h, w)
 		- edge_anchors: # anchors * 4 (y0, x0, y1, x1)
 		- anchor_area: # anchors * 1 (area)
+	
+	:rtype Tuple[np.ndarray, np.ndarray, np.ndarray]
 	"""
 
 	if anchors_setting is None:
@@ -73,15 +78,65 @@ def generate_default_anchor_maps(anchors_setting=None, input_shape=INPUT_SIZE):
 				centre_anchors_size = centre_anchor_map[..., 2:4]
 
 				edge_anchor_map = np.concatenate(
-					(centre_anchor_loc - centre_anchor_size / 2.),
-					(centre_anchor_loc + centre_anchor_size / 2.),
+					((centre_anchors_loc - centre_anchors_size / 2.),
+					(centre_anchors_loc + centre_anchors_size / 2.)),
 					axis=-1
 				)
 
-				anchor_area_map = weight * height
+				anchor_area_map = centre_anchor_map[..., 2] * centre_anchor_map[..., 3]
 
 				centre_anchors = np.concatenate((centre_anchors, centre_anchor_map.reshape(-1, 4)))
 				edge_anchors = np.concatenate((edge_anchors, edge_anchor_map.reshape(-1, 4)))
 				anchor_areas = np.concatenate((anchor_areas, anchor_area_map.reshape(-1)))
 
 	return centre_anchors, edge_anchors, anchor_areas
+
+def hard_nms(cdds, topn=10, iou_thresh=0.25):
+	"""
+	Hard Non-Maximum Suppression (NMS) algorithm to select the top scoring bounding boxes while suppressing
+	highly overlapping boxes.
+
+	:param
+		- cdds: Detected bounding boxes with confidence scores, shape N * 5 (confidence, y0, x0, y1, x1)
+		- topn: Maximum number of bounding boxes to retain
+		- iou_thresh: Intersection over Union (IoU) threshold for overlap suppression
+	
+	:type
+		- cdds: np.ndarray
+		- topn: int
+		- iou_thresh: float
+
+	:return: Selected bounding boxes after hard NMS
+	:rtype: np.ndarray
+	"""
+
+	if not (type(cdds).__module__ == 'numpy' and len(cdds.shape) == 2 and cdds.shape[1] >= 5):
+		raise TypeError('edge_box_map should be N * 5+ ndarray')
+
+	cdds = cdds.copy()
+	indices = np.argsort(cdds[:, 0])
+	cdds = cdds[indices]
+	cdd_results = []
+
+	res = cdds
+
+	while res.any():
+		cdd = res[-1]
+
+		cdd_results.append(cdd)
+		if len(cdd_results) == topn:
+			return np.array(cdd_results)
+
+		res = res[:-1]
+
+		start_max = np.maximum(res[:, 1:3], cdd[1:3])
+		end_min = np.minimum(res[:, 3:5], cdd[3:5])
+		lengths = end_min - start_max
+
+		intersec_map = lengths[:, 0] * lengths[:, 1]
+		intersec_map[np.logical_or(lengths[:, 0] < 0, lengths[:, 1] < 0)] = 0
+		iou_map_cur = intersec_map / ((res[:, 3] - res[:, 1]) * (res[:, 4] - res[:, 2]) + (cdd[3] - cdd[1]) * (cdd[4] - cdd[2]) - intersec_map)
+
+		res = res[iou_map_cur < iou_thresh]
+
+	return np.array(cdd_results)

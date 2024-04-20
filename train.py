@@ -3,7 +3,7 @@ import argparse
 
 from core import data
 from core.data import CustomImageDataset
-from core.models import transfer_cnn
+from core.models import transfer_cnn, attention_net
 import utils
 from config import INPUT_SIZE, BATCH_SIZE
 from config import IMAGE_FOLDER
@@ -14,7 +14,8 @@ from torch.utils.data import DataLoader
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model_list = {
-	"transfer_cnn": transfer_cnn.Model("transfer_cnn", device)
+	"transfer_cnn": transfer_cnn.Model("transfer_cnn", device),
+	"attention_net": attention_net.Model("attention_net", device),
 }
 
 if not data.check_cub_200_2011():
