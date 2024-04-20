@@ -1,0 +1,9 @@
+INPUT_SIZE = (448, 448)
+BATCH_SIZE = 16
+
+DATA_FOLDER = 'CUB_200_2011'
+DATA_URL = 'https://data.caltech.edu/records/65de6-vp158/files/CUB_200_2011.tgz'
+DATA_FILE = 'CUB_200_2011.tgz'
+TGZ_MD5 = '97eceeb196236b17998738112f37df78'
+
+IMAGE_FOLDER = f'{DATA_FOLDER}/images'

@@ -12,13 +12,15 @@ from os import path
 
 import pandas as pd
 
-DATA_FOLDER = 'CUB_200_2011'
-DATA_URL = 'https://data.caltech.edu/records/65de6-vp158/files/CUB_200_2011.tgz'
-DATA_FILE = 'CUB_200_2011.tgz'
-TGZ_MD5 = '97eceeb196236b17998738112f37df78'
+from config import DATA_FOLDER, DATA_URL, DATA_FILE, TGZ_MD5
+
+
+def check_cub_200_2011():
+	return path.exists(path.join(os.getcwd(), DATA_FOLDER))
+
 
 def download_cub_200_2011():
-	if path.exists(path.join(os.getcwd(), DATA_FOLDER)):
+	if check_cub_200_2011():
 		print(f"CUB_200_211 data is already downloaded and extracted.")
 		return
 
@@ -74,7 +76,7 @@ class CustomImageDataset(Dataset):
 	def __getitem__(self, idx):
 		img_path = path.join(self.img_dir, self.img_labels.iloc[idx, 1])
 		image = read_image(img_path)
-		label = self.img_labels.iloc[idx, 2]
+		label = self.img_labels.iloc[idx, 2] - 1
 		if self.transform:
 			image = self.transform(image)
 		if self.target_transform:
