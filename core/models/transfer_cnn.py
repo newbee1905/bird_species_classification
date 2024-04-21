@@ -47,7 +47,7 @@ class Model(BasicModel):
 
 		# Configuration for training
 		self.criterion = nn.CrossEntropyLoss()
-		self.optimizer = optim.Adam(self.model.parameters(), lr=3e-3, weight_decay=0.0001)
+		self.optimizer = optim.Adam(self.model.parameters(), lr=3e-4, weight_decay=1e-4)
 		self.early_stopper = EarlyStopper(patience=15, min_delta=10)
 	
 	def _train(self, phase, dl):

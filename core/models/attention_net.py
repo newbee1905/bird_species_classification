@@ -174,10 +174,10 @@ class Model(BasicModel):
 		self.concat_parameters = list(self.model.concat_net.parameters())
 		self.partcls_parameters = list(self.model.partcls_net.parameters())
 
-		self.raw_optimizer = optim.Adam(self.raw_parameters, lr=3e-3, weight_decay=1e-4)
-		self.part_optimizer = optim.Adam(self.part_parameters, lr=3e-3, weight_decay=1e-4)
-		self.concat_optimizer = optim.Adam(self.concat_parameters, lr=3e-3, weight_decay=1e-4)
-		self.partcls_optimizer = optim.Adam(self.partcls_parameters, lr=3e-3, weight_decay=1e-4)
+		self.raw_optimizer = optim.Adam(self.raw_parameters, lr=3e-4, weight_decay=1e-4)
+		self.part_optimizer = optim.Adam(self.part_parameters, lr=3e-4, weight_decay=1e-4)
+		self.concat_optimizer = optim.Adam(self.concat_parameters, lr=3e-4, weight_decay=1e-4)
+		self.partcls_optimizer = optim.Adam(self.partcls_parameters, lr=3e-4, weight_decay=1e-4)
 
 	
 	def _train(self, phase, dl):
