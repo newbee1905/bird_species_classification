@@ -47,6 +47,7 @@ python train.py <model> [-n NUM_EPOCHS] [-e]
 
 - `<model>`: Specify the model to use for training and evaluation. Choose from the following options:
 	- `transfer_cnn`: Transfer learning-based CNN model.
+	- `attention_net`: NTS-Net model based of this repo [yangze0930/NTS-Net](https://github.com/yangze0930/NTS-Net).
 - `-n NUM_EPOCHS`, `--num-epochs NUM_EPOCHS` (optional): Number of epochs for training (default is 10).
 - `-e, --evaluate-only` (optional): If provided, the model will only be evaluated without further training.
 
